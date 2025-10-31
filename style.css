@@ -536,6 +536,8 @@ body {
     padding: 1.5rem;
     border: 1px solid #fff;
     animation: slideInUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 @keyframes slideInUp {
     from { opacity: 0; transform: translateY(30px) scale(0.98); }
@@ -681,4 +683,213 @@ body {
     background-color: rgba(40, 167, 69, 0.1);
     color: #1c7430;
     border: 1px solid rgba(40, 167, 69, 0.2);
+}
+/* 🔥 ADMIN MINI-CALENDARIO */
+.admin-mini-cal-container {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin-mini-cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+#admin-mini-month-year {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.admin-mini-nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0.25rem;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.admin-mini-nav-btn:hover {
+    background: var(--background);
+    color: var(--accent);
+}
+
+.admin-mini-nav-btn svg { width: 18px; height: 18px; }
+
+.admin-mini-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    text-align: center;
+}
+
+.admin-mini-day-header {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 0.25rem 0;
+}
+
+.admin-mini-date {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.admin-mini-date.other-month {
+    color: var(--border);
+    cursor: default;
+}
+
+.admin-mini-date.today {
+    border-color: var(--cal-orange);
+    background: rgba(253, 126, 20, 0.1);
+}
+
+.admin-mini-date.selected {
+    background: var(--accent) !important;
+    color: white !important;
+    border-color: var(--accent) !important;
+    position: relative;
+}
+
+.admin-mini-date.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: white;
+    color: var(--accent);
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.admin-mini-date:hover:not(.other-month):not(.selected) {
+    background: var(--background);
+}
+
+.admin-selection-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: var(--glass-background);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+#admin-selected-count {
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 0.95rem;
+}
+
+.admin-mini-btn {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-mini-btn:hover {
+    background: rgba(220, 53, 69, 0.2);
+}
+
+/* 💡 Tip de selección de semana */
+.admin-tip {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: rgba(102, 53, 6, 0.05);
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.admin-tip kbd {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: monospace;
+    font-size: 0.85em;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* 🗑️ Zona de peligro - Limpiar TODO */
+.admin-danger-zone {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(220, 53, 69, 0.05);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 8px;
+}
+
+.admin-danger-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    color: #dc3545;
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-danger-btn:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.admin-danger-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Responsive: Perfecto en 450px */
+@media (max-width: 450px) {
+    .admin-mini-cal-container { padding: 0.75rem; }
+    .admin-mini-date { font-size: 0.8rem; }
+    #admin-modal { max-height: 85vh; }
 }

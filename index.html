@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
     
-    <script src="https://unpkg.com/lucide-react@0.294.0/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -214,18 +214,46 @@
             <div id="admin-editor-view">
                 <h3 data-lang="admin_editor_title">Editar Disponibilidad</h3>
                 
-                <div class="admin-form-group">
-                    <label for="admin-edit-date-start" data-lang="admin_start_date">Fecha de Inicio</label>
-                    <input type="date" id="admin-edit-date-start">
+                <!-- 🔥 MINI-CALENDARIO MULTI-SELECT -->
+                <div class="admin-mini-cal-container">
+                    <!-- Header -->
+                    <div class="admin-mini-cal-header">
+                        <button id="admin-mini-prev" class="admin-mini-nav-btn"><i data-lucide="chevron-left"></i></button>
+                        <span id="admin-mini-month-year"></span>
+                        <button id="admin-mini-next" class="admin-mini-nav-btn"><i data-lucide="chevron-right"></i></button>
+                    </div>
+                    
+                    <!-- Días semana -->
+                    <div class="admin-mini-cal-grid" id="admin-mini-days-header">
+                        <!-- JS lo llena -->
+                    </div>
+                    
+                    <!-- Días mes -->
+                    <div class="admin-mini-cal-grid" id="admin-mini-dates-grid">
+                        <!-- JS lo llena -->
+                    </div>
                 </div>
                 
-                <div class="admin-form-group">
-                    <label for="admin-edit-date-end" data-lang="admin_end_date">Fecha de Fin (Opcional)</label>
-                    <input type="date" id="admin-edit-date-end">
+                <!-- 📊 CONTADOR + LIMPIAR -->
+                <div class="admin-selection-info">
+                    <span id="admin-selected-count">0 días seleccionados</span>
+                    <button id="admin-clear-selection" class="admin-mini-btn">🗑️ Limpiar</button>
                 </div>
                 
-                <p class="admin-note" data-lang="admin_date_note">Si se omite la fecha de fin, solo se modificará el día de inicio.</p>
-
+                <!-- 💡 TIP DE SELECCIÓN SEMANA -->
+                <div class="admin-tip">
+                    💡 <strong>Tip:</strong> Mantén <kbd>Shift</kbd> + Click para seleccionar semana completa
+                </div>
+                
+                <!-- 🗑️ BOTÓN LIMPIAR TODO -->
+                <div class="admin-danger-zone">
+                    <button id="admin-clear-all-btn" class="admin-danger-btn">
+                        <i data-lucide="trash-2"></i>
+                        <span>Limpiar TODOS los estados del calendario</span>
+                    </button>
+                </div>
+                
+                <!-- 🎚️ ESTADO -->
                 <div class="admin-form-group">
                     <label data-lang="admin_status">Estado</label>
                     <div class="admin-status-selector">
@@ -242,7 +270,11 @@
                         <label for="status-none" class="status-label dot-none" data-lang="admin_clear">Quitar</label>
                     </div>
                 </div>
-                <p id="admin-save-success" class="admin-success-msg" data-lang="admin_save_success">¡Guardado!</p>
+                
+                <!-- ✅ ÉXITO -->
+                <p id="admin-save-success" class="admin-success-msg">¡Guardado!</p>
+                
+                <!-- 🔽 BOTONES -->
                 <div class="admin-modal-footer">
                     <button id="admin-logout" class="admin-btn-secondary" data-lang="admin_logout">Salir</button>
                     <button id="admin-submit-save" class="admin-btn-primary" data-lang="admin_save">Guardar</button>

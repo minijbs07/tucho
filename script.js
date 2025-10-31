@@ -57,9 +57,13 @@ const adminSaveSuccess = document.getElementById("admin-save-success");
 // --- App State ---
 let currentLang = "es";
 let calCurrentDate = new Date(); 
+// 🔥 ADMIN MINI-CAL
+let adminMiniSelectedDates = new Set();
+let adminMiniCurrentDate = new Date();
 let appState = {
     isAdminLoggedIn: false
 };
+
 
 // --- 1. DATOS DE LA CARTA ---
 const menuData = {
@@ -244,25 +248,53 @@ const wineData = {
 
 // --- 3. DATOS DE DISPONIBILIDAD ---
 let availabilityData = {};
-
+function normalizeStatus(status) {
+    const statusMap = {
+        // Español
+        'alta': 'green', 'baja': 'orange', 'completo': 'red',
+        'Alta': 'green', 'Baja': 'orange', 'Completo': 'red',
+        // Inglés
+        'high': 'green', 'low': 'orange', 'full': 'red',
+        'High': 'green', 'Low': 'orange', 'Full': 'red',
+        // Cualquier otro → null (se elimina)
+    };
+    return statusMap[status] || (['green', 'orange', 'red'].includes(status) ? status : null);
+}
 async function loadAvailabilityFromDB() {
     try {
         const doc = await db.collection("disponibilidad").doc("calendario").get();
         if (doc.exists) {
-            availabilityData = doc.data();
+            let rawData = doc.data();
+            // 🔄 MIGRA AUTOMÁTICAMENTE datos antiguos a nuevo formato
+            const migrated = {};
+            let hasChanges = false;
+            for (const date in rawData) {
+                const newStatus = normalizeStatus(rawData[date]);
+                if (newStatus) {
+                    migrated[date] = newStatus;
+                    if (newStatus !== rawData[date]) hasChanges = true;
+                }
+            }
+            availabilityData = migrated;
+            
+            // 💾 Si hubo migración, guarda AUTOMÁTICO en Firebase (una sola vez)
+            if (hasChanges) {
+                console.log("🔄 Migrando datos antiguos a nuevo formato...");
+                await db.collection("disponibilidad").doc("calendario").set(availabilityData);
+                console.log("✅ Migración completada y guardada en Firebase!");
+            }
         } else {
             availabilityData = {};
-            console.log("No se encontró el documento, se usará un calendario vacío.");
         }
     } catch (error) {
-        console.error("Error al cargar datos de Firestore:", error);
-        availabilityData = {}; 
+        console.error("Error al cargar/migrar datos:", error);
+        availabilityData = {};
     }
     renderCalendar(calCurrentDate);
 }
 
 function saveAvailabilityToDB() {
-    db.collection("disponibilidad").doc("calendario").set(availabilityData, { merge: true })
+    db.collection("disponibilidad").doc("calendario").set(availabilityData)
         .then(() => {
             console.log("¡Disponibilidad guardada en Firebase!");
         })
@@ -581,8 +613,16 @@ function handleAdminLogin() {
             appContainer.classList.add("admin-mode-active"); 
             adminLoginView.classList.remove("active");
             adminEditorView.classList.add("active");
-            adminEditDateStartInput.value = new Date().toISOString().split('T')[0];
-            adminEditDateEndInput.value = ""; // Limpiar campo de fecha fin
+            
+            // ✅ Inicializa el mini-calendario inmediatamente
+            adminMiniCurrentDate = new Date();
+            adminMiniSelectedDates.clear();
+            
+            setTimeout(() => {
+                renderAdminMiniCalendar();
+                lucide.createIcons();
+            }, 10);
+            
             renderCalendar(calCurrentDate);
         })
         .catch((error) => {
@@ -608,76 +648,179 @@ function handleCalendarDateClick(isoDate) {
     adminLoginView.classList.remove("active");
     adminEditorView.classList.add("active");
     
-    // Rellenar la fecha de inicio con el día clicado
-    adminEditDateStartInput.value = isoDate;
-    // Limpiar la fecha de fin
-    adminEditDateEndInput.value = ""; 
+    // 🔥 PRE-SELECCIONA el día clicado
+    adminMiniSelectedDates = new Set([isoDate]);
+    adminMiniCurrentDate = new Date(isoDate);
     
+    // ✅ RENDERIZA el mini-calendario DESPUÉS de actualizar la fecha
+    setTimeout(() => {
+        renderAdminMiniCalendar();
+        lucide.createIcons(); // Re-inicializa los iconos
+    }, 10);
+    
+    updateSelectedCount();
+    
+    // Pre-selecciona estado actual
     const currentStatus = availabilityData[isoDate] || "none";
     const radioToCheck = document.getElementById(`status-${currentStatus}`);
-    if(radioToCheck) {
-        radioToCheck.checked = true;
-    }
+    if(radioToCheck) radioToCheck.checked = true;
     
     adminSaveSuccess.style.display = "none";
 }
 
-// ¡ACTUALIZADO para Rango de Fechas!
-function handleAdminSave() {
-    const startDateStr = adminEditDateStartInput.value;
-    const endDateStr = adminEditDateEndInput.value;
-    const selectedStatus = document.querySelector('input[name="admin-status"]:checked').value;
-
-    if (!startDateStr) {
-        alert("Por favor, selecciona al menos una fecha de inicio.");
-        return;
-    }
-
-    // Usamos T12:00:00 para evitar problemas de zona horaria al iterar
-    const startDate = new Date(startDateStr + "T12:00:00");
+// 🔥 RENDER MINI-CAL
+function renderAdminMiniCalendar() {
+    const year = adminMiniCurrentDate.getFullYear();
+    const month = adminMiniCurrentDate.getMonth();
+    const lang = currentLang;
     
-    // Comprobar si hay fecha de fin. Si no, solo se aplica a un día.
-    const endDate = endDateStr ? new Date(endDateStr + "T12:00:00") : startDate;
-
-    if (endDate < startDate) {
-        alert("La fecha de fin no puede ser anterior a la fecha de inicio.");
-        return;
+    // Mes
+    const monthNames = [
+        uiTranslations[lang]?.month_1 || "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    document.getElementById("admin-mini-month-year").innerText = `${monthNames[month]} ${year}`;
+    
+    // Días header
+    const daysHeader = document.getElementById("admin-mini-days-header");
+    daysHeader.innerHTML = "";
+    const dayLabels = uiTranslations[lang] ? 
+        [uiTranslations[lang].day_mon, uiTranslations[lang].day_tue, uiTranslations[lang].day_wed, 
+         uiTranslations[lang].day_thu, uiTranslations[lang].day_fri, uiTranslations[lang].day_sat, uiTranslations[lang].day_sun] : 
+        ["L","M","X","J","V","S","D"];
+    dayLabels.forEach(label => {
+        const div = document.createElement("div");
+        div.className = "admin-mini-day-header";
+        div.innerText = label;
+        daysHeader.appendChild(div);
+    });
+    
+    // Días mes
+    const datesGrid = document.getElementById("admin-mini-dates-grid");
+    datesGrid.innerHTML = "";
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+    
+    // Padding
+    for (let i = 0; i < startOffset; i++) {
+        const div = document.createElement("div");
+        div.className = "admin-mini-date other-month";
+        datesGrid.appendChild(div);
     }
-
-    let currentDate = new Date(startDate);
-    let modifiedDays = 0;
-
-    // Iterar desde la fecha de inicio hasta la fecha de fin
-    while (currentDate <= endDate) {
-        const isoDate = currentDate.toISOString().split('T')[0];
-
-        if (selectedStatus === 'none' || selectedStatus === '') {
-            delete availabilityData[isoDate];
-        } else {
-            availabilityData[isoDate] = selectedStatus;
-        }
+    
+    // Días
+    const todayStr = new Date().toISOString().split('T')[0];
+    for (let day = 1; day <= daysInMonth; day++) {
+        const isoDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const div = document.createElement("div");
+        div.className = `admin-mini-date ${adminMiniSelectedDates.has(isoDate) ? 'selected' : ''} ${isoDate === todayStr ? 'today' : ''}`;
+        div.innerHTML = `<span>${day}</span>`;
+        div.dataset.date = isoDate;
+        div.dataset.weekStart = getWeekStart(isoDate); // 🔥 NUEVO: guarda el inicio de semana
         
-        // Avanzar al siguiente día
-        currentDate.setDate(currentDate.getDate() + 1);
-        modifiedDays++;
+        div.addEventListener("click", (e) => {
+            if (e.shiftKey) {
+                // Shift+Click = Selecciona semana completa
+                selectWeek(isoDate);
+            } else {
+                // Click normal = Selecciona día individual
+                toggleAdminMiniDate(isoDate, div);
+            }
+        });
+        datesGrid.appendChild(div);
     }
-
-    saveAvailabilityToDB();
-    
-    adminSaveSuccess.style.display = "block";
-    adminSaveSuccess.innerText = `¡Guardado! (${modifiedDays} día(s) afectado(s))`;
-    
-    // Navegar el calendario al mes de la fecha de inicio
-    calCurrentDate = startDate;
-    renderCalendar(calCurrentDate);
-
-    setTimeout(() => {
-        adminSaveSuccess.style.display = "none";
-        // Resetear texto
-        adminSaveSuccess.innerText = uiTranslations[currentLang].admin_save_success || "¡Guardado con éxito!";
-    }, 2500);
 }
 
+// 🔥 NUEVA FUNCIÓN: Obtiene el lunes de la semana de una fecha
+function getWeekStart(isoDate) {
+    const date = new Date(isoDate);
+    const day = date.getDay();
+    const diff = (day === 0 ? -6 : 1) - day; // Ajuste para que lunes sea inicio
+    const monday = new Date(date);
+    monday.setDate(date.getDate() + diff);
+    return monday.toISOString().split('T')[0];
+}
+
+// 🔥 NUEVA FUNCIÓN: Selecciona todos los días de una semana
+function selectWeek(isoDate) {
+    const startDate = new Date(getWeekStart(isoDate));
+    
+    for (let i = 0; i < 7; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
+        // Solo selecciona días del mes actual visible
+        if (currentDate.getMonth() === adminMiniCurrentDate.getMonth()) {
+            adminMiniSelectedDates.add(dateStr);
+        }
+    }
+    
+    renderAdminMiniCalendar();
+    lucide.createIcons();
+    updateSelectedCount();
+}
+
+function toggleAdminMiniDate(isoDate, el) {
+    if (adminMiniSelectedDates.has(isoDate)) {
+        adminMiniSelectedDates.delete(isoDate);
+        el.classList.remove("selected");
+    } else {
+        adminMiniSelectedDates.add(isoDate);
+        el.classList.add("selected");
+    }
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const count = adminMiniSelectedDates.size;
+    const langKey = count === 0 ? "0 días seleccionados" : 
+                    count === 1 ? "1 día seleccionado" : 
+                    `${count} días seleccionados`;
+    document.getElementById("admin-selected-count").innerText = langKey;
+    document.getElementById("admin-submit-save").disabled = count === 0;
+}
+
+function changeAdminMiniMonth(offset) {
+    adminMiniCurrentDate.setMonth(adminMiniCurrentDate.getMonth() + offset);
+    renderAdminMiniCalendar();
+    lucide.createIcons(); // Re-inicializa los iconos después de cambiar mes
+}
+
+// 🔥 GUARDAR MULTI
+function handleAdminSave() {
+    const selectedRadio = document.querySelector('input[name="admin-status"]:checked');
+    if (!selectedRadio || adminMiniSelectedDates.size === 0) {
+        alert("Selecciona días Y estado.");
+        return;
+    }
+    
+    const status = selectedRadio.value;
+    let savedCount = 0;
+    
+    adminMiniSelectedDates.forEach(isoDate => {
+        if (status === 'none') {
+            delete availabilityData[isoDate];
+        } else {
+            availabilityData[isoDate] = status;
+        }
+        savedCount++;
+    });
+    
+    saveAvailabilityToDB();
+    renderCalendar(calCurrentDate); // Actualiza cal principal
+    
+    adminSaveSuccess.style.display = "block";
+    adminSaveSuccess.innerText = `¡${savedCount} día(s) guardado(s)!`;
+    
+    setTimeout(() => {
+        adminSaveSuccess.style.display = "none";
+        adminSaveSuccess.innerText = uiTranslations[currentLang].admin_save_success;
+        closeAdminModal(); // Cierra auto
+    }, 2000);
+}
 
 // --- 6. EVENT LISTENERS ---
 
@@ -720,6 +863,26 @@ adminSubmitLoginBtn.addEventListener("click", handleAdminLogin);
 adminSubmitSaveBtn.addEventListener("click", handleAdminSave);
 adminLogoutBtn.addEventListener("click", handleAdminLogout);
 
+// 🔥 ADMIN MINI-CAL EVENTS
+document.getElementById("admin-mini-prev").addEventListener("click", () => changeAdminMiniMonth(-1));
+document.getElementById("admin-mini-next").addEventListener("click", () => changeAdminMiniMonth(1));
+document.getElementById("admin-clear-selection").addEventListener("click", () => {
+    adminMiniSelectedDates.clear();
+    renderAdminMiniCalendar();
+    updateSelectedCount();
+});
+
+// 🗑️ LIMPIAR TODO EL CALENDARIO
+document.getElementById("admin-clear-all-btn").addEventListener("click", () => {
+    if (confirm("⚠️ ¿Estás seguro de que quieres ELIMINAR TODOS los estados del calendario?\n\nEsta acción NO se puede deshacer.")) {
+        availabilityData = {};
+        saveAvailabilityToDB();
+        renderCalendar(calCurrentDate);
+        renderAdminMiniCalendar();
+        lucide.createIcons();
+        alert("✅ Todos los estados han sido eliminados del calendario.");
+    }
+});
 
 // --- 7. INICIALIZACIÓN ---
 updateLanguage(currentLang);
@@ -730,6 +893,4 @@ const initialActiveTab = document.querySelector(".tab-item.active");
 updateTabIndicator(initialActiveTab);
 
 // Carga los datos de Firebase y LUEGO renderiza el calendario
-loadAvailabilityFromDB(); 
-
-// NOTA: La llamada a lucide.createIcons() se movió al index.html
+loadAvailabilityFromDB();
