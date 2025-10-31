@@ -1,0 +1,633 @@
+/* ===== DEFINICIÓN DE ESTILO (Rústico + Apple) ===== */
+:root {
+    --background: #fdfaf6;
+    --text-primary: #3a3a3a;
+    --text-secondary: #6e5e50;
+    --accent: #663506;
+    --border: #e0d9d1;
+    --glass-background: rgba(253, 250, 246, 0.8);
+    --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Lora', 'Times New Roman', serif;
+
+    /* Variables de color para el calendario */
+    --cal-green: #28a745;
+    --cal-orange: #fd7e14;
+    --cal-red: #dc3545;
+    --cal-none: #ccc;
+}
+
+/* ===== RESETEO BÁSICO ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-ui);
+    background-color: #ccc;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ===== CONTENEDOR DE LA "APP" ===== */
+.app-container {
+    max-width: 450px;
+    min-height: 100vh;
+    margin: 0 auto;
+    background-color: var(--background);
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 80px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+/* ===== SELECTOR DE IDIOMA ===== */
+.language-selector {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 100;
+}
+.lang-toggle-btn {
+    background: var(--glass-background);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+#language-code-display {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+.app-container.on-home .lang-toggle-btn {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+.app-container.on-home #language-code-display {
+    color: white;
+}
+.app-container:not(.on-home) .lang-toggle-btn {
+    background: white;
+    border: 1px solid var(--border);
+}
+.app-container:not(.on-home) #language-code-display {
+    color: var(--text-secondary);
+}
+.language-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    width: 120px;
+    z-index: 110; /* Por encima del modal */
+}
+.language-menu.show { display: block; }
+.lang-btn {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+}
+.lang-btn:hover { background: var(--background); }
+.lang-btn.active {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* ===== NAVEGACIÓN (SwiftUI TabView) ===== */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 450px;
+    margin: 0 auto;
+    height: 75px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding-top: 12px; 
+    border-top: 1px solid var(--border);
+    background: var(--glass-background);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 10;
+}
+.tab-indicator {
+    position: absolute;
+    top: 0;
+    height: 2px;
+    background-color: var(--accent);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 1rem;
+    transition: color 0.2s ease;
+}
+.tab-item svg {
+    width: 22px;
+    height: 22px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.tab-item.active { color: var(--accent); }
+.tab-item.active svg { transform: scale(1.1); }
+
+/* ===== SISTEMA DE PÁGINAS Y ANIMACIÓN ===== */
+.page { display: none; }
+.page.active {
+    display: block;
+    animation: fadeIn 0.4s ease-out;
+}
+.page:not(#page-home) {
+    padding: 1.5rem;
+    padding-top: 5rem;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== PÁGINA: INICIO ===== */
+.hero {
+    height: 65vh;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--text-primary);
+}
+.hero-slides { width: 100%; height: 100%; }
+.hero-slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    animation: kenburns 20s infinite;
+}
+.hero-slide.active { opacity: 1; }
+@keyframes kenburns {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+.hero-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    padding: 0 1rem;
+}
+.logo-title {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 500;
+}
+.logo-subtitle {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin-top: -10px;
+}
+.hero-cta {
+    margin-top: 2rem;
+    padding: 0.8rem 1.8rem;
+    background: var(--glass-background);
+    backdrop-filter: blur(10px);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.hero-cta:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.info-section {
+    background-color: var(--background);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    transform: translateY(-20px);
+    position: relative;
+    padding: 1.5rem;
+}
+.info-header { padding-bottom: 0.5rem; }
+.info-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--accent);
+}
+.info-list {
+    list-style: none;
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-top: 1rem;
+}
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem 1.25rem;
+}
+.info-item:not(:last-child) { border-bottom: 1px solid var(--border); }
+.info-item svg {
+    color: var(--accent);
+    width: 24px;
+    flex-shrink: 0;
+}
+.info-item a {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    text-decoration: none;
+    color: var(--text-primary);
+}
+.info-item a span:first-child { font-weight: 500; }
+.info-item a span:last-child {
+    color: var(--text-secondary);
+    text-align: right;
+}
+.info-item a .address { font-size: 0.9rem; line-height: 1.4; }
+
+
+/* ================== */
+/* ESTILOS CALENDARIO */
+/* ================== */
+#calendar-subtitle {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.calendar-container {
+    margin-top: 1rem;
+    background-color: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.calendar-header h3 {
+    font-family: var(--font-display);
+    color: var(--accent);
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+.cal-nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0.25rem;
+    border-radius: 50%;
+}
+.cal-nav-btn:hover { background-color: var(--background); color: var(--accent); }
+.cal-nav-btn svg { width: 20px; height: 20px; }
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+.cal-day-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding-bottom: 0.5rem;
+}
+.cal-date {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+.cal-date.other-month {
+    color: var(--border);
+}
+.cal-date.today {
+    background-color: var(--background);
+    color: var(--accent);
+    font-weight: 600;
+}
+/* Modo Admin: hace que los días sean clicables */
+.admin-mode-active .cal-date:not(.other-month) {
+    cursor: pointer;
+}
+.admin-mode-active .cal-date:not(.other-month):hover {
+    background-color: var(--background);
+}
+
+.date-dot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.dot-green { background-color: var(--cal-green); }
+.dot-orange { background-color: var(--cal-orange); }
+.dot-red { background-color: var(--cal-red); }
+
+.calendar-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    list-style: none;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.calendar-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.dot-legend {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+.admin-link-container {
+    text-align: right;
+    margin-top: 0.5rem;
+}
+#admin-login-btn {
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s ease;
+}
+#admin-login-btn:hover { background-color: var(--border); color: var(--accent); }
+#admin-login-btn svg { width: 14px; height: 14px; }
+
+/* ===== PÁGINAS: CARTA Y VINOS ===== */
+.page-header {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    position: relative; 
+    margin-top: -1.5rem;
+    padding-top: 1.5rem;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.page-header h1 {
+    font-family: var(--font-display);
+    font-size: 2.5rem; 
+    color: var(--accent);
+}
+.menu-category { margin-top: 2rem; }
+.menu-category h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.menu-category h2 svg {
+    width: 20px;
+    height: 20px;
+    color: var(--accent);
+}
+.menu-list {
+    list-style: none;
+    background-color: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    animation: fadeIn 0.3s ease-out;
+}
+.list-item:not(:last-child) { border-bottom: 1px solid var(--border); }
+.item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.item-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.item-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+.item-price {
+    font-weight: 500;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.page-footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+
+/* ================== */
+/* ESTILOS MODAL ADMIN (Simplificado) */
+/* ================== */
+
+#admin-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 200;
+    display: none; /* Oculto por defecto */
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+#admin-modal {
+    background: var(--background);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 380px;
+    padding: 1.5rem;
+    border: 1px solid #fff;
+    animation: slideInUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(30px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+#admin-modal h3 {
+    font-family: var(--font-display);
+    color: var(--accent);
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Vistas de Login */
+#admin-login-view {
+    display: block;
+}
+
+/* Estilos de Formularios */
+.admin-form-group {
+    margin-bottom: 1rem;
+}
+.admin-form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.admin-form-group input[type="text"],
+.admin-form-group input[type="password"] {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+}
+.admin-form-group input[type="text"]:focus,
+.admin-form-group input[type="password"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(102, 53, 6, 0.1);
+}
+
+/* Botones del Modal */
+.admin-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+.admin-btn-primary, .admin-btn-secondary {
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.admin-btn-primary {
+    background-color: var(--accent);
+    color: white;
+}
+.admin-btn-primary:hover {
+    background-color: #4a2705;
+}
+.admin-btn-secondary {
+    background-color: var(--border);
+    color: var(--text-secondary);
+}
+.admin-btn-secondary:hover {
+    background-color: #c9c1b9;
+}
+
+/* Mensajes de Error / Éxito */
+.admin-error-msg {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: none; /* Ocultos por defecto */
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #a51827;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+/* Estilos de Editor de Rango (Eliminados) */

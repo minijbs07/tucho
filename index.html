@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Tucho App</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide-react@0.294.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+    <div class="app-container on-home">
+
+        <div class="language-selector">
+            <button class="lang-toggle-btn">
+                <span id="language-code-display">ES</span>
+            </button>
+            <div class="language-menu">
+                <button class="lang-btn active" data-lang-set="es">Español</button>
+                <button class="lang-btn" data-lang-set="en">English</button>
+                <button class="lang-btn" data-lang-set="de">Deutsch</button>
+                <button class="lang-btn" data-lang-set="fr">Français</button>
+            </div>
+        </div>
+
+        <main class="page active" id="page-home">
+            <header class="hero">
+                <div class="hero-slides">
+                    <div class="hero-slide active" style="background-image: url('https://latucho.com.es/wp-content/uploads/2021/04/la-tucho-restaurante.jpg');"></div>
+                    <div class="hero-slide" style="background-image: url('https://latucho.com.es/wp-content/uploads/2020/06/la-tucho-restaurante-2.jpg');"></div>
+                    <div class="hero-slide" style="background-image: url('https://latucho.com.es/wp-content/uploads/2020/06/la-tucho-restaurante-5.jpg');"></div>
+                </div>
+                
+                <div class="hero-content">
+                    <h1 class="logo-title">La Tucho</h1>
+                    <p class="logo-subtitle" data-lang="home_subtitle">Restaurante en Santander</p>
+                    
+                    <button class="hero-cta" data-lang="home_cta">Ver Carta</button>
+                </div>
+            </header>
+
+            <section class="info-section">
+                <div class="info-header">
+                    <h2 data-lang="home_reservations">Reservas y Pedidos</h2>
+                </div>
+                <ul class="info-list">
+                    <li class="info-item list-item-animate">
+                        <i data-lucide="phone"></i>
+                        <a href="tel:+34942336177">
+                            <span data-lang="home_phone_landline">Teléfono Fijo</span>
+                            <span>942 336 177</span>
+                        </a>
+                    </li>
+                    <li class="info-item list-item-animate" style="animation-delay: 0.1s;">
+                        <i data-lucide="smartphone"></i>
+                        <a href="tel:+34673752220">
+                            <span data-lang="home_phone_mobile">Móvil</span>
+                            <span>673 752 220</span>
+                        </a>
+                    </li>
+                    <li class="info-item list-item-animate" style="animation-delay: 0.2s;">
+                        <i data-lucide="map-pin"></i>
+                        <a href="https://www.google.com/maps/search/?api=1&query=La+Tucho+Restaurante+c/+San+Román,+12,+Corbán,+Santander" target="_blank">
+                            <span data-lang="home_address">Dirección</span>
+                            <span class="address">c/ San Román, 12<br>Bº Corbán, Santander</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="info-header" style="margin-top: 2rem; padding-bottom: 0;">
+                    <h4 id="calendar-subtitle" data-lang="home_availability_title">Consulta nuestra disponibilidad</h4>
+                </div>
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button id="cal-prev" class="cal-nav-btn"><i data-lucide="chevron-left"></i></button>
+                        <h3 id="cal-month-year">Octubre 2025</h3>
+                        <button id="cal-next" class="cal-nav-btn"><i data-lucide="chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="cal-day-header" data-lang="day_mon">L</div>
+                        <div class="cal-day-header" data-lang="day_tue">M</div>
+                        <div class="cal-day-header" data-lang="day_wed">X</div>
+                        <div class="cal-day-header" data-lang="day_thu">J</div>
+                        <div class="cal-day-header" data-lang="day_fri">V</div>
+                        <div class="cal-day-header" data-lang="day_sat">S</div>
+                        <div class="cal-day-header" data-lang="day_sun">D</div>
+                    </div>
+                    <div class="calendar-grid" id="cal-dates-grid">
+                        </div>
+                    <ul class="calendar-legend">
+                        <li><span class="dot-legend dot-green"></span><span data-lang="legend_high">Alta</span></li>
+                        <li><span class="dot-legend dot-orange"></span><span data-lang="legend_low">Baja</span></li>
+                        <li><span class="dot-legend dot-red"></span><span data-lang="legend_full">Completo</span></li>
+                    </ul>
+                </div>
+                
+                <div class="admin-link-container">
+                    <button id="admin-login-btn"><i data-lucide="settings-2"></i> <span data-lang="admin_login">Admin</span></button>
+                </div>
+
+            </section>
+        </main>
+
+        <main class="page" id="page-carta">
+            <header class="page-header">
+                <div class="header-content">
+                    <h1 data-lang="menu_title">Nuestra Carta</h1>
+                </div>
+            </header>
+            
+            <section class="menu-category">
+                <h2><i data-lucide="sparkles"></i><span data-lang="menu_section_starters">Para Picar</span></h2>
+                <ul class="menu-list" id="starters-list">
+                    </ul>
+            </section>
+
+            <section class="menu-category">
+                <h2><i data-lucide="fish"></i><span data-lang="menu_section_fish">Pescados</span></h2>
+                <ul class="menu-list" id="fish-list">
+                    </ul>
+            </section>
+
+            <section class="menu-category">
+                <h2><i data-lucide="beef"></i><span data-lang="menu_section_meats">Carnes</span></h2>
+                <ul class="menu-list" id="meats-list">
+                    </ul>
+            </section>
+            
+            <footer class="page-footer" id="menu-footer" data-lang="menu_footer">
+                Servicio de Pan 1,50 € / IVA incluido
+            </footer>
+        </main>
+
+        <main class="page" id="page-vinos">
+            <header class="page-header">
+                <div class="header-content">
+                     <h1 data-lang="wine_title">Nuestros Vinos</h1>
+                </div>
+            </header>
+
+            <section class="menu-category">
+                <h2><i data-lucide="grape"></i><span data-lang="wine_section_riojas">Riojas</span></h2>
+                <ul class="menu-list" id="wine-riojas-list">
+                </ul>
+            </section>
+
+            <section class="menu-category">
+                <h2><i data-lucide="award"></i><span data-lang="wine_section_reservas">Reservas</span></h2>
+                <ul class="menu-list" id="wine-reservas-list">
+                </ul>
+            </section>
+
+            <section class="menu-category">
+                <h2><i data-lucide="sailboat"></i><span data-lang="wine_section_albarinos">Albariños</span></h2>
+                <ul class="menu-list" id="wine-albarinos-list">
+                </ul>
+            </section>
+
+            <section class="menu-category">
+                <h2><i data-lucide="party-popper"></i><span data-lang="wine_section_cavas">Cavas y Champagnes</span></h2>
+                <ul class="menu-list" id="wine-cavas-list">
+                </ul>
+            </section>
+
+            <footer class="page-footer" data-lang="wine_footer">
+                IVA 10 % incluido
+            </footer>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-indicator"></div>
+
+            <button class="tab-item active" data-page="page-home">
+                <i data-lucide="home"></i>
+                <span data-lang="tab_home">Inicio</span>
+            </button>
+            <button class="tab-item" data-page="page-carta">
+                <i data-lucide="utensils"></i>
+                <span data-lang="tab_menu">Carta</span>
+            </button>
+            <button class="tab-item" data-page="page-vinos">
+                <i data-lucide="wine"></i>
+                <span data-lang="tab_wine">Vinos</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <div id="admin-modal-overlay">
+        <div id="admin-modal">
+            
+            <div id="admin-login-view" class="active"> <h3 data-lang="admin_modal_title">Acceso Admin</h3>
+                <p id="admin-login-error" class="admin-error-msg" data-lang="admin_login_error">Usuario o contraseña incorrectos.</p>
+                <div class="admin-form-group">
+                    <label for="admin-user" data-lang="admin_user">Email</label>
+                    <input type="text" id="admin-user" value="tucho@admin.com">
+                </div>
+                <div class="admin-form-group">
+                    <label for="admin-pass" data-lang="admin_pass">Contraseña</label>
+                    <input type="password" id="admin-pass">
+                </div>
+                <div class="admin-modal-footer">
+                    <button id="admin-cancel-login" class="admin-btn-secondary" data-lang="admin_cancel">Cancelar</button>
+                    <button id="admin-submit-login" class="admin-btn-primary" data-lang="admin_login_btn">Entrar</button>
+                </div>
+            </div>
+
+            </div>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <script>
+      // Tu configuración de Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCx6bwLc0Vp6ZcYWuSwBDaa3ATf4r2tXcY",
+        authDomain: "tuchoapp-eaf89.firebaseapp.com",
+        projectId: "tuchoapp-eaf89",
+        storageBucket: "tuchoapp-eaf89.firebasestorage.app",
+        messagingSenderId: "693258670535",
+        appId: "1:693258670535:web:0313c7ce75a5ca47cb49e2",
+        measurementId: "G-ZNP9NJ3EB8"
+      };
+
+      // Inicializar Firebase
+      firebase.initializeApp(firebaseConfig);
+      
+      // Hacer 'auth' y 'db' globales para que script.js pueda usarlas
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+    </script>
+    
+    <script src="script.js" defer></script>
+    
+    <script defer>
+        // Esta es la solución para los iconos que no se cargan.
+        // Espera un momento a que todo esté listo y luego crea los iconos.
+        setTimeout(() => {
+             lucide.createIcons();
+        }, 100);
+    </script>
+
+</body>
+</html>
