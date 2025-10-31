@@ -1,4 +1,6 @@
 // --- DOM Elements ---
+// (Ya no se necesita el "DOMContentLoaded" gracias a 'defer' en el HTML)
+
 const appContainer = document.querySelector(".app-container");
 const tabs = document.querySelectorAll(".tab-item");
 const pages = document.querySelectorAll(".page");
@@ -31,19 +33,25 @@ const calDatesGrid = document.getElementById("cal-dates-grid");
 const calPrevBtn = document.getElementById("cal-prev");
 const calNextBtn = document.getElementById("cal-next");
 
-// --- Admin Modal Elements (Simplificado) ---
+// --- Admin Modal Elements ---
 const adminLoginBtn = document.getElementById("admin-login-btn");
 const adminModalOverlay = document.getElementById("admin-modal-overlay");
 // Vistas
 const adminLoginView = document.getElementById("admin-login-view");
+const adminEditorView = document.getElementById("admin-editor-view");
 // Vista Login
 const adminUserInput = document.getElementById("admin-user");
 const adminPassInput = document.getElementById("admin-pass");
 const adminSubmitLoginBtn = document.getElementById("admin-submit-login");
 const adminCancelLoginBtn = document.getElementById("admin-cancel-login");
 const adminLoginError = document.getElementById("admin-login-error");
-
-// (Referencias a Editor eliminadas)
+// Vista Editor (Actualizada)
+const adminEditDateStartInput = document.getElementById("admin-edit-date-start");
+const adminEditDateEndInput = document.getElementById("admin-edit-date-end");
+const adminStatusSelector = document.querySelector(".admin-status-selector");
+const adminSubmitSaveBtn = document.getElementById("admin-submit-save");
+const adminLogoutBtn = document.getElementById("admin-logout");
+const adminSaveSuccess = document.getElementById("admin-save-success");
 
 
 // --- App State ---
@@ -278,8 +286,12 @@ const uiTranslations = {
         admin_modal_title: "Acceso Admin", admin_login_error: "Email o contraseña incorrectos.",
         admin_user: "Email", admin_pass: "Contraseña",
         admin_cancel: "Cancelar", admin_login_btn: "Entrar",
-        // Textos del editor eliminados
-        admin_logout: "Salir", 
+        admin_editor_title: "Editar Disponibilidad", 
+        admin_start_date: "Fecha de Inicio", admin_end_date: "Fecha de Fin (Opcional)",
+        admin_date_note: "Si se omite la fecha de fin, solo se modificará el día de inicio.",
+        admin_status: "Estado",
+        admin_clear: "Quitar", admin_logout: "Salir", admin_save: "Guardar",
+        admin_save_success: "¡Guardado con éxito!",
         menu_title: "Nuestra Carta",
         menu_section_starters: "Para Picar", menu_section_fish: "Pescados", menu_section_meats: "Carnes",
         menu_footer: "Servicio de Pan 1,50 € / IVA incluido",
@@ -299,7 +311,12 @@ const uiTranslations = {
         admin_modal_title: "Admin Access", admin_login_error: "Incorrect email or password.",
         admin_user: "Email", admin_pass: "Password",
         admin_cancel: "Cancel", admin_login_btn: "Login",
-        admin_logout: "Logout",
+        admin_editor_title: "Edit Availability",
+        admin_start_date: "Start Date", admin_end_date: "End Date (Optional)",
+        admin_date_note: "If end date is omitted, only the start date will be modified.",
+        admin_status: "Status",
+        admin_clear: "Clear", admin_logout: "Logout", admin_save: "Save",
+        admin_save_success: "Saved successfully!",
         menu_title: "Our Menu",
         menu_section_starters: "Starters", menu_section_fish: "Fish", menu_section_meats: "Meats",
         menu_footer: "Bread Service 1.50 € / VAT included",
@@ -319,7 +336,12 @@ const uiTranslations = {
         admin_modal_title: "Admin-Zugang", admin_login_error: "E-Mail oder Passwort falsch.",
         admin_user: "E-Mail", admin_pass: "Passwort",
         admin_cancel: "Abbrechen", admin_login_btn: "Einloggen",
-        admin_logout: "Ausloggen",
+        admin_editor_title: "Verfügbarkeit bearbeiten",
+        admin_start_date: "Startdatum", admin_end_date: "Enddatum (Optional)",
+        admin_date_note: "Wenn kein Enddatum angegeben wird, wird nur das Startdatum geändert.",
+        admin_status: "Status",
+        admin_clear: "Löschen", admin_logout: "Ausloggen", admin_save: "Speichern",
+        admin_save_success: "Gespeichert!",
         menu_title: "Speisekarte",
         menu_section_starters: "Vorspeisen", menu_section_fish: "Fischgerichte", menu_section_meats: "Fleischgerichte",
         menu_footer: "Brot 1,50 € / MwSt. inbegriffen",
@@ -339,7 +361,12 @@ const uiTranslations = {
         admin_modal_title: "Accès Admin", admin_login_error: "Email ou mot de passe incorrect.",
         admin_user: "Email", admin_pass: "Mot de passe",
         admin_cancel: "Annuler", admin_login_btn: "Entrer",
-        admin_logout: "Sortir",
+        admin_editor_title: "Éditer Disponibilité",
+        admin_start_date: "Date de début", admin_end_date: "Date de fin (Optionnel)",
+        admin_date_note: "Si la date de fin est omise, seule la date de début sera modifiée.",
+        admin_status: "Statut",
+        admin_clear: "Enlever", admin_logout: "Sortir", admin_save: "Enregistrer",
+        admin_save_success: "Enregistré!",
         menu_title: "Notre Carte",
         menu_section_starters: "Entrées", menu_section_fish: "Poissons", menu_section_meats: "Viandes",
         menu_footer: "Service pain 1,50 € / TVA incluse",
@@ -370,8 +397,6 @@ function updateLanguage(lang) {
 
     langMenu.classList.remove("show");
     
-    // Actualizar el texto del botón de admin si está logueado
-    updateAdminButtonText();
     renderCalendar(calCurrentDate);
 }
 
@@ -517,7 +542,6 @@ function renderCalendar(date) {
             dayEl.appendChild(dot);
         }
         
-        // ¡Listener de Clic para "Pintar"!
         if (appState.isAdminLoggedIn) {
             dayEl.addEventListener("click", () => handleCalendarDateClick(isoDate));
         }
@@ -531,32 +555,20 @@ function changeCalendarMonth(offset) {
     renderCalendar(calCurrentDate);
 }
 
-// --- LÓGICA DEL MODAL ADMIN (Simplificada) ---
+// --- LÓGICA DEL MODAL ADMIN ---
 
 function showAdminModal() {
     adminModalOverlay.style.display = "flex";
+    adminLoginView.classList.add("active");
+    adminEditorView.classList.remove("active");
     adminLoginError.style.display = "none";
+    adminSaveSuccess.style.display = "none";
     adminPassInput.value = "";
 }
 
 function closeAdminModal() {
     adminModalOverlay.style.display = "none";
 }
-
-// NUEVA FUNCIÓN para actualizar el botón de admin
-function updateAdminButtonText() {
-    const lang = currentLang;
-    if (appState.isAdminLoggedIn) {
-        adminLoginBtn.querySelector('span').innerText = uiTranslations[lang].admin_logout || "Salir";
-        adminLoginBtn.querySelector('i').dataset.lucide = "log-out";
-    } else {
-        adminLoginBtn.querySelector('span').innerText = uiTranslations[lang].admin_login || "Admin";
-        adminLoginBtn.querySelector('i').dataset.lucide = "settings-2";
-    }
-    // Refrescar el icono
-    lucide.createIcons();
-}
-
 
 function handleAdminLogin() {
     const email = adminUserInput.value; 
@@ -567,14 +579,10 @@ function handleAdminLogin() {
         .then((userCredential) => {
             appState.isAdminLoggedIn = true;
             appContainer.classList.add("admin-mode-active"); 
-            
-            // Actualizar el botón principal
-            updateAdminButtonText();
-            
-            // Cerrar el modal de login
-            closeAdminModal();
-            
-            // Volver a dibujar el calendario para añadir listeners de clic
+            adminLoginView.classList.remove("active");
+            adminEditorView.classList.add("active");
+            adminEditDateStartInput.value = new Date().toISOString().split('T')[0];
+            adminEditDateEndInput.value = ""; // Limpiar campo de fecha fin
             renderCalendar(calCurrentDate);
         })
         .catch((error) => {
@@ -586,55 +594,89 @@ function handleAdminLogout() {
     auth.signOut().then(() => {
         appState.isAdminLoggedIn = false;
         appContainer.classList.remove("admin-mode-active");
-        
-        // Actualizar el botón principal
-        updateAdminButtonText();
-        
-        // Volver a dibujar el calendario para quitar listeners
         renderCalendar(calCurrentDate);
-        
+        closeAdminModal();
+        adminLoginView.classList.add("active");
+        adminEditorView.classList.remove("active");
     }).catch((error) => {
         console.error("Error al cerrar sesión: ", error);
     });
 }
 
-// ¡NUEVA LÓGICA DE "PINTAR"!
 function handleCalendarDateClick(isoDate) {
-    // Si no es admin, no hacer nada (aunque el listener no debería estar)
-    if (!appState.isAdminLoggedIn) return;
-
-    // Define el ciclo de "pintar"
-    const statesCycle = [undefined, 'green', 'orange', 'red'];
+    adminModalOverlay.style.display = "flex";
+    adminLoginView.classList.remove("active");
+    adminEditorView.classList.add("active");
     
-    // 1. Encontrar el estado actual
-    const currentState = availabilityData[isoDate];
+    // Rellenar la fecha de inicio con el día clicado
+    adminEditDateStartInput.value = isoDate;
+    // Limpiar la fecha de fin
+    adminEditDateEndInput.value = ""; 
     
-    // 2. Encontrar el índice actual en el ciclo
-    const currentIndex = statesCycle.indexOf(currentState);
-    
-    // 3. Calcular el siguiente índice (y volver al inicio si es el último)
-    const nextIndex = (currentIndex + 1) % statesCycle.length;
-    
-    // 4. Obtener el siguiente estado
-    const nextState = statesCycle[nextIndex];
-    
-    // 5. Actualizar el objeto de datos
-    if (nextState === undefined) {
-        // Si el siguiente estado es 'undefined', borrar la clave
-        delete availabilityData[isoDate];
-    } else {
-        // Si no, asignar el nuevo color
-        availabilityData[isoDate] = nextState;
+    const currentStatus = availabilityData[isoDate] || "none";
+    const radioToCheck = document.getElementById(`status-${currentStatus}`);
+    if(radioToCheck) {
+        radioToCheck.checked = true;
     }
     
-    // 6. Guardar los cambios en Firebase
-    saveAvailabilityToDB();
-    
-    // 7. Volver a dibujar el calendario para mostrar el cambio al instante
-    renderCalendar(calCurrentDate);
+    adminSaveSuccess.style.display = "none";
 }
 
-// (Función handleAdminSave eliminada, ya no es necesaria)
+// ¡ACTUALIZADO para Rango de Fechas!
+function handleAdminSave() {
+    const startDateStr = adminEditDateStartInput.value;
+    const endDateStr = adminEditDateEndInput.value;
+    const selectedStatus = document.querySelector('input[name="admin-status"]:checked').value;
+
+    if (!startDateStr) {
+        alert("Por favor, selecciona al menos una fecha de inicio.");
+        return;
+    }
+
+    // Usamos T12:00:00 para evitar problemas de zona horaria al iterar
+    const startDate = new Date(startDateStr + "T12:00:00");
+    
+    // Comprobar si hay fecha de fin. Si no, solo se aplica a un día.
+    const endDate = endDateStr ? new Date(endDateStr + "T12:00:00") : startDate;
+
+    if (endDate < startDate) {
+        alert("La fecha de fin no puede ser anterior a la fecha de inicio.");
+        return;
+    }
+
+    let currentDate = new Date(startDate);
+    let modifiedDays = 0;
+
+    // Iterar desde la fecha de inicio hasta la fecha de fin
+    while (currentDate <= endDate) {
+        const isoDate = currentDate.toISOString().split('T')[0];
+
+        if (selectedStatus === 'none' || selectedStatus === '') {
+            delete availabilityData[isoDate];
+        } else {
+            availabilityData[isoDate] = selectedStatus;
+        }
+        
+        // Avanzar al siguiente día
+        currentDate.setDate(currentDate.getDate() + 1);
+        modifiedDays++;
+    }
+
+    saveAvailabilityToDB();
+    
+    adminSaveSuccess.style.display = "block";
+    adminSaveSuccess.innerText = `¡Guardado! (${modifiedDays} día(s) afectado(s))`;
+    
+    // Navegar el calendario al mes de la fecha de inicio
+    calCurrentDate = startDate;
+    renderCalendar(calCurrentDate);
+
+    setTimeout(() => {
+        adminSaveSuccess.style.display = "none";
+        // Resetear texto
+        adminSaveSuccess.innerText = uiTranslations[currentLang].admin_save_success || "¡Guardado con éxito!";
+    }, 2500);
+}
 
 
 // --- 6. EVENT LISTENERS ---
@@ -666,15 +708,7 @@ heroCtaButton.addEventListener("click", () => { if (cartaTabButton) cartaTabButt
 calPrevBtn.addEventListener("click", () => changeCalendarMonth(-1));
 calNextBtn.addEventListener("click", () => changeCalendarMonth(1));
 
-// ¡Listener del botón de Admin ACTUALIZADO!
-adminLoginBtn.addEventListener("click", () => {
-    if (appState.isAdminLoggedIn) {
-        handleAdminLogout();
-    } else {
-        showAdminModal();
-    }
-});
-
+adminLoginBtn.addEventListener("click", showAdminModal);
 adminCancelLoginBtn.addEventListener("click", closeAdminModal);
 adminModalOverlay.addEventListener("click", (e) => {
     if (e.target === adminModalOverlay) {
@@ -683,7 +717,8 @@ adminModalOverlay.addEventListener("click", (e) => {
 });
 
 adminSubmitLoginBtn.addEventListener("click", handleAdminLogin);
-// (Listener de Guardar eliminado)
+adminSubmitSaveBtn.addEventListener("click", handleAdminSave);
+adminLogoutBtn.addEventListener("click", handleAdminLogout);
 
 
 // --- 7. INICIALIZACIÓN ---
@@ -697,4 +732,4 @@ updateTabIndicator(initialActiveTab);
 // Carga los datos de Firebase y LUEGO renderiza el calendario
 loadAvailabilityFromDB(); 
 
-// (La llamada a lucide.createIcons() se gestiona en el HTML)
+// NOTA: La llamada a lucide.createIcons() se movió al index.html

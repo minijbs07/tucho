@@ -308,7 +308,7 @@ body {
 }
 
 .calendar-container {
-    margin-top: 1rem;
+    margin-top: 1rem; /* Reducido para acercar al nuevo título */
     background-color: #fff;
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -509,7 +509,7 @@ body {
 
 
 /* ================== */
-/* ESTILOS MODAL ADMIN (Simplificado) */
+/* ESTILOS MODAL ADMIN */
 /* ================== */
 
 #admin-modal-overlay {
@@ -550,8 +550,11 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* Vistas de Login */
-#admin-login-view {
+/* Vistas de Login y Editor */
+#admin-login-view, #admin-editor-view {
+    display: none; /* Se gestiona con JS */
+}
+#admin-login-view.active, #admin-editor-view.active {
     display: block;
 }
 
@@ -567,7 +570,8 @@ body {
     display: block;
 }
 .admin-form-group input[type="text"],
-.admin-form-group input[type="password"] {
+.admin-form-group input[type="password"],
+.admin-form-group input[type="date"] {
     width: 100%;
     padding: 0.75rem;
     font-size: 1rem;
@@ -577,10 +581,52 @@ body {
     font-family: var(--font-ui);
 }
 .admin-form-group input[type="text"]:focus,
-.admin-form-group input[type="password"]:focus {
+.admin-form-group input[type="password"]:focus,
+.admin-form-group input[type="date"]:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(102, 53, 6, 0.1);
+}
+
+/* Selector de Estado (Radio) */
+.admin-status-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.admin-status-selector input[type="radio"] {
+    display: none;
+}
+.admin-status-selector .status-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+.admin-status-selector .status-label::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--cal-none);
+    border: 1px solid var(--border);
+}
+.admin-status-selector .status-label.dot-green::before { background-color: var(--cal-green); }
+.admin-status-selector .status-label.dot-orange::before { background-color: var(--cal-orange); }
+.admin-status-selector .status-label.dot-red::before { background-color: var(--cal-red); }
+.admin-status-selector .status-label.dot-none::before { background-color: #fff; }
+
+.admin-status-selector input[type="radio"]:checked + .status-label {
+    background-color: var(--background);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 /* Botones del Modal */
@@ -618,16 +664,21 @@ body {
 }
 
 /* Mensajes de Error / Éxito */
-.admin-error-msg {
+.admin-error-msg, .admin-success-msg {
     font-size: 0.9rem;
     font-weight: 500;
     padding: 0.75rem;
     border-radius: 8px;
     margin-bottom: 1rem;
     display: none; /* Ocultos por defecto */
+}
+.admin-error-msg {
     background-color: rgba(220, 53, 69, 0.1);
     color: #a51827;
     border: 1px solid rgba(220, 53, 69, 0.2);
 }
-
-/* Estilos de Editor de Rango (Eliminados) */
+.admin-success-msg {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #1c7430;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}

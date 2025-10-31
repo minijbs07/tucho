@@ -194,7 +194,8 @@
     <div id="admin-modal-overlay">
         <div id="admin-modal">
             
-            <div id="admin-login-view" class="active"> <h3 data-lang="admin_modal_title">Acceso Admin</h3>
+            <div id="admin-login-view">
+                <h3 data-lang="admin_modal_title">Acceso Admin</h3>
                 <p id="admin-login-error" class="admin-error-msg" data-lang="admin_login_error">Usuario o contraseña incorrectos.</p>
                 <div class="admin-form-group">
                     <label for="admin-user" data-lang="admin_user">Email</label>
@@ -210,7 +211,45 @@
                 </div>
             </div>
 
+            <div id="admin-editor-view">
+                <h3 data-lang="admin_editor_title">Editar Disponibilidad</h3>
+                
+                <div class="admin-form-group">
+                    <label for="admin-edit-date-start" data-lang="admin_start_date">Fecha de Inicio</label>
+                    <input type="date" id="admin-edit-date-start">
+                </div>
+                
+                <div class="admin-form-group">
+                    <label for="admin-edit-date-end" data-lang="admin_end_date">Fecha de Fin (Opcional)</label>
+                    <input type="date" id="admin-edit-date-end">
+                </div>
+                
+                <p class="admin-note" data-lang="admin_date_note">Si se omite la fecha de fin, solo se modificará el día de inicio.</p>
+
+                <div class="admin-form-group">
+                    <label data-lang="admin_status">Estado</label>
+                    <div class="admin-status-selector">
+                        <input type="radio" id="status-green" name="admin-status" value="green">
+                        <label for="status-green" class="status-label dot-green" data-lang="legend_high">Alta</label>
+                        
+                        <input type="radio" id="status-orange" name="admin-status" value="orange">
+                        <label for="status-orange" class="status-label dot-orange" data-lang="legend_low">Baja</label>
+                        
+                        <input type="radio" id="status-red" name="admin-status" value="red">
+                        <label for="status-red" class="status-label dot-red" data-lang="legend_full">Completo</label>
+                        
+                        <input type="radio" id="status-none" name="admin-status" value="none">
+                        <label for="status-none" class="status-label dot-none" data-lang="admin_clear">Quitar</label>
+                    </div>
+                </div>
+                <p id="admin-save-success" class="admin-success-msg" data-lang="admin_save_success">¡Guardado!</p>
+                <div class="admin-modal-footer">
+                    <button id="admin-logout" class="admin-btn-secondary" data-lang="admin_logout">Salir</button>
+                    <button id="admin-submit-save" class="admin-btn-primary" data-lang="admin_save">Guardar</button>
+                </div>
             </div>
+
+        </div>
     </div>
 
 
@@ -241,11 +280,7 @@
     <script src="script.js" defer></script>
     
     <script defer>
-        // Esta es la solución para los iconos que no se cargan.
-        // Espera un momento a que todo esté listo y luego crea los iconos.
-        setTimeout(() => {
-             lucide.createIcons();
-        }, 100);
+        lucide.createIcons();
     </script>
 
 </body>
