@@ -173,8 +173,6 @@
         </main>
 
         <nav class="tab-bar">
-            <div class="tab-indicator"></div>
-
             <button class="tab-item active" data-page="page-home">
                 <i data-lucide="home"></i>
                 <span data-lang="tab_home">Inicio</span>
@@ -191,6 +189,7 @@
 
     </div>
 
+    <!-- Modal Admin -->
     <div id="admin-modal-overlay">
         <div id="admin-modal">
             
@@ -214,38 +213,26 @@
             <div id="admin-editor-view">
                 <h3 data-lang="admin_editor_title">Editar Disponibilidad</h3>
                 
-                <!-- 🔥 MINI-CALENDARIO MULTI-SELECT -->
                 <div class="admin-mini-cal-container">
-                    <!-- Header -->
                     <div class="admin-mini-cal-header">
                         <button id="admin-mini-prev" class="admin-mini-nav-btn"><i data-lucide="chevron-left"></i></button>
                         <span id="admin-mini-month-year"></span>
                         <button id="admin-mini-next" class="admin-mini-nav-btn"><i data-lucide="chevron-right"></i></button>
                     </div>
                     
-                    <!-- Días semana -->
-                    <div class="admin-mini-cal-grid" id="admin-mini-days-header">
-                        <!-- JS lo llena -->
-                    </div>
-                    
-                    <!-- Días mes -->
-                    <div class="admin-mini-cal-grid" id="admin-mini-dates-grid">
-                        <!-- JS lo llena -->
-                    </div>
+                    <div class="admin-mini-cal-grid" id="admin-mini-days-header"></div>
+                    <div class="admin-mini-cal-grid" id="admin-mini-dates-grid"></div>
                 </div>
                 
-                <!-- 📊 CONTADOR + LIMPIAR -->
                 <div class="admin-selection-info">
                     <span id="admin-selected-count">0 días seleccionados</span>
                     <button id="admin-clear-selection" class="admin-mini-btn">🗑️ Limpiar</button>
                 </div>
                 
-                <!-- 💡 TIP DE SELECCIÓN SEMANA -->
                 <div class="admin-tip">
                     💡 <strong>Tip:</strong> Mantén <kbd>Shift</kbd> + Click para seleccionar semana completa
                 </div>
                 
-                <!-- 🗑️ BOTÓN LIMPIAR TODO -->
                 <div class="admin-danger-zone">
                     <button id="admin-clear-all-btn" class="admin-danger-btn">
                         <i data-lucide="trash-2"></i>
@@ -253,7 +240,6 @@
                     </button>
                 </div>
                 
-                <!-- 🎚️ ESTADO -->
                 <div class="admin-form-group">
                     <label data-lang="admin_status">Estado</label>
                     <div class="admin-status-selector">
@@ -271,10 +257,8 @@
                     </div>
                 </div>
                 
-                <!-- ✅ ÉXITO -->
                 <p id="admin-save-success" class="admin-success-msg">¡Guardado!</p>
                 
-                <!-- 🔽 BOTONES -->
                 <div class="admin-modal-footer">
                     <button id="admin-logout" class="admin-btn-secondary" data-lang="admin_logout">Salir</button>
                     <button id="admin-submit-save" class="admin-btn-primary" data-lang="admin_save">Guardar</button>
@@ -284,13 +268,17 @@
         </div>
     </div>
 
+    <!-- Modal Imagen -->
+    <div id="image-modal" class="image-modal">
+        <span id="image-modal-close" class="image-modal-close">&times;</span>
+        <img id="image-modal-img" class="image-modal-content">
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
     <script>
-      // Tu configuración de Firebase
       const firebaseConfig = {
         apiKey: "AIzaSyCx6bwLc0Vp6ZcYWuSwBDaa3ATf4r2tXcY",
         authDomain: "tuchoapp-eaf89.firebaseapp.com",
@@ -301,10 +289,7 @@
         measurementId: "G-ZNP9NJ3EB8"
       };
 
-      // Inicializar Firebase
       firebase.initializeApp(firebaseConfig);
-      
-      // Hacer 'auth' y 'db' globales para que script.js pueda usarlas
       const auth = firebase.auth();
       const db = firebase.firestore();
     </script>

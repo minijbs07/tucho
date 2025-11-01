@@ -1,10 +1,7 @@
 // --- DOM Elements ---
-// (Ya no se necesita el "DOMContentLoaded" gracias a 'defer' en el HTML)
-
 const appContainer = document.querySelector(".app-container");
 const tabs = document.querySelectorAll(".tab-item");
 const pages = document.querySelectorAll(".page");
-const tabIndicator = document.querySelector(".tab-indicator");
 const heroCtaButton = document.querySelector(".hero-cta");
 const cartaTabButton = document.querySelector('.tab-item[data-page="page-carta"]');
 
@@ -33,19 +30,16 @@ const calDatesGrid = document.getElementById("cal-dates-grid");
 const calPrevBtn = document.getElementById("cal-prev");
 const calNextBtn = document.getElementById("cal-next");
 
-// --- Admin Modal Elements ---
+// Admin Modal Elements
 const adminLoginBtn = document.getElementById("admin-login-btn");
 const adminModalOverlay = document.getElementById("admin-modal-overlay");
-// Vistas
 const adminLoginView = document.getElementById("admin-login-view");
 const adminEditorView = document.getElementById("admin-editor-view");
-// Vista Login
 const adminUserInput = document.getElementById("admin-user");
 const adminPassInput = document.getElementById("admin-pass");
 const adminSubmitLoginBtn = document.getElementById("admin-submit-login");
 const adminCancelLoginBtn = document.getElementById("admin-cancel-login");
 const adminLoginError = document.getElementById("admin-login-error");
-// Vista Editor (Actualizada)
 const adminEditDateStartInput = document.getElementById("admin-edit-date-start");
 const adminEditDateEndInput = document.getElementById("admin-edit-date-end");
 const adminStatusSelector = document.querySelector(".admin-status-selector");
@@ -53,148 +47,173 @@ const adminSubmitSaveBtn = document.getElementById("admin-submit-save");
 const adminLogoutBtn = document.getElementById("admin-logout");
 const adminSaveSuccess = document.getElementById("admin-save-success");
 
+// Image Modal Elements
+const imageModal = document.getElementById("image-modal");
+const imageModalImg = document.getElementById("image-modal-img");
+const imageModalClose = document.getElementById("image-modal-close");
 
-// --- App State ---
+// App State
 let currentLang = "es";
 let calCurrentDate = new Date(); 
-// 🔥 ADMIN MINI-CAL
 let adminMiniSelectedDates = new Set();
 let adminMiniCurrentDate = new Date();
 let appState = {
     isAdminLoggedIn: false
 };
 
-
 // --- 1. DATOS DE LA CARTA ---
 const menuData = {
-    // --- PARA PICAR ---
     "anchoas": {
         name_es: "Anchoas del Cantábrico", name_en: "Cantabrian Anchovies", name_de: "Kantabrische Sardellen", name_fr: "Anchois de Cantabrie",
         price: "21,00 €",
         desc_es: "", desc_en: "", desc_de: "", desc_fr: "",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1580554530778-ca36943938b2?w=800"
     },
     "ensalada_tomate": {
         name_es: "Ensalada Tomate y Queso", name_en: "Tomato & Cheese Salad", name_de: "Tomaten-Käse-Salat", name_fr: "Salade Tomate et Fromage",
         price: "14,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800"
     },
     "ensaladilla": {
         name_es: "Ensaladilla Rusa", name_en: "Russian Salad", name_de: "Russischer Salat", name_fr: "Salade Russe",
         price: "14,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?w=800"
     },
     "puding": {
         name_es: "Puding Casero", name_en: "Homemade Pudding", name_de: "Hausgemachter Pudding", name_fr: "Pudding Fait Maison",
         price: "14,50 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800"
     },
     "jamon": {
         name_es: "Jamón Ibérico", name_en: "Iberian Ham", name_de: "Iberischer Schinken", name_fr: "Jambon Ibérique",
         price: "25,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1622222984956-7b76be93cd2c?w=800"
     },
     "croquetas": {
         name_es: "Croquetas de Jamón Ibérico", name_en: "Iberian Ham Croquettes", name_de: "Kroketten mit iberischem Schinken", name_fr: "Croquettes de jambon ibérique",
         price: "14,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1598511726623-d2e9996892f0?w=800"
     },
     "rabas": {
         name_es: "Rabas de Magano", name_en: "Fried Squid", name_de: "Tintenfischringe", name_fr: "Calamars frits",
         price: "20,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1604909052743-94e838986d24?w=800"
     },
     "almejas": {
         name_es: "Almejas Marinera o Sartén", name_en: "Clams (Marinera or Pan-fried)", name_de: "Venusmuscheln (Marinera oder Pfanne)", name_fr: "Palourdes (Marinera ou Poêlées)",
         price: "25,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1559047127-f28324e2c4f2?w=800"
     },
     "gambas": {
         name_es: "Gambas Frescas", name_en: "Fresh Prawns", name_de: "Frische Garnelen", name_fr: "Crevettes Fraîches",
         price: "22,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=800"
     },
-     "pulpo": {
+    "pulpo": {
         name_es: "Pulpo Plancha", name_en: "Grilled Octopus", name_de: "Gegrillter Oktopus", name_fr: "Poulpe grillé",
         price: "19,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1608835291093-ef9a4f398b9c?w=800"
     },
     "zamburinas": {
         name_es: "Zamburiñas Plancha", name_en: "Grilled Scallops", name_de: "Gegrillte Jakobsmuscheln", name_fr: "Pétoncles grillés",
         price: "21,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1559847844-5315695dadae?w=800"
     },
     "pastel_setas": {
         name_es: "Pastel templado de Setas", name_en: "Warm Mushroom Pâté", name_de: "Warmer Pilzkuchen", name_fr: "Gâteau tiède aux champignons",
         price: "16,00 €",
-        category: "starters"
+        category: "starters",
+        image: "https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=800"
     },
     // --- PESCADOS ---
     "lubina": {
         name_es: "Lubina al Horno o Plancha", name_en: "Baked or Grilled Sea Bass", name_de: "Wolfsbarsch (Ofen oder Gegrillt)", name_fr: "Loup de mer (Four ou Plancha)",
         price: "55,00 €/Kg",
         desc_es: "2 personas", desc_en: "2 people", desc_de: "2 Personen", desc_fr: "2 personnes",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800"
     },
     "lenguado": {
         name_es: "Lenguado Plancha o Menier", name_en: "Grilled or Meunière Sole", name_de: "Seezunge (Gegrillt oder Müllerin)", name_fr: "Sole (Plancha ou Meunière)",
         price: "58,00 €/Kg",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=800"
     },
     "rodaballo": {
         name_es: "Rodaballo Plancha o Frito", name_en: "Grilled or Fried Turbot", name_de: "Steinbutt (Gegrillt oder Frittiert)", name_fr: "Turbot (Plancha ou Frit)",
         price: "55,00 €/Kg",
         desc_es: "2 personas", desc_en: "2 people", desc_de: "2 Personen", desc_fr: "2 personnes",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=800"
     },
     "merluza_rebozada": {
         name_es: "Merluza Rebozada o Plancha", name_en: "Battered or Grilled Hake", name_de: "Seehecht (Paniert oder Gegrillt)", name_fr: "Merlu (Pané ou Plancha)",
         price: "24,00 €",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800"
     },
     "merluza_salsa": {
         name_es: "Merluza en Salsa Verde", name_en: "Hake in Green Sauce", name_de: "Seehecht in grüner Soße", name_fr: "Merlu en sauce verte",
         price: "26,00 €",
         desc_es: "con Almejas y Gambas", desc_en: "with Clams and Prawns", desc_de: "mit Muscheln und Garnelen", desc_fr: "aux palourdes et crevettes",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=800"
     },
     "rape_rebozado": {
         name_es: "Rape Rebozado", name_en: "Battered Monkfish", name_de: "Seeteufel (Paniert)", name_fr: "Lotte (Panée)",
         price: "24,00 €",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=800"
     },
     "rape_horno": {
         name_es: "Rape al Horno o Plancha", name_en: "Baked or Grilled Monkfish", name_de: "Seeteufel (Ofen oder Gegrillt)", name_fr: "Lotte (Four ou Plancha)",
         price: "55,00 €/Kg",
         desc_es: "2 personas", desc_en: "2 people", desc_de: "2 Personen", desc_fr: "2 personnes",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800"
     },
     "san_martin": {
         name_es: "San Martín Plancha o Frito", name_en: "John Dory (Grilled or Fried)", name_de: "Petersfisch (Gegrillt oder Frittiert)", name_fr: "Saint-Pierre (Plancha ou Frit)",
         price: "55,00 €/Kg",
         desc_es: "2 personas", desc_en: "2 people", desc_de: "2 Personen", desc_fr: "2 personnes",
-        category: "fish"
+        category: "fish",
+        image: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=800"
     },
     // --- CARNES ---
     "solomillo": {
         name_es: "Solomillo de Novilla", name_en: "Heifer Sirloin", name_de: "Färsenfilet", name_fr: "Filet de génisse",
         price: "24,50 €",
-        category: "meats"
+        category: "meats",
+        image: "https://images.unsplash.com/photo-1558030006-450675393462?w=800"
     },
     "chuletillas": {
         name_es: "Chuletillas de Lechazo", name_en: "Baby Lamb Chops", name_de: "Milchlammkoteletts", name_fr: "Côtelettes d'agneau de lait",
         price: "21,00 €",
-        category: "meats"
+        category: "meats",
+        image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800"
     },
     "chuleta": {
         name_es: "Chuleta", name_en: "T-Bone Steak", name_de: "T-Bone-Steak", name_fr: "Côte de bœuf",
         price: "44,00 €/kg",
-        category: "meats"
+        category: "meats",
+        image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=800"
     },
     "entrecot": {
         name_es: "Entrecot", name_en: "Entrecote", name_de: "Entrecote", name_fr: "Entrecôte",
         price: "22,00 €",
-        category: "meats"
+        category: "meats",
+        image: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=800"
     }
 };
 
@@ -202,47 +221,58 @@ const menuData = {
 const wineData = {
     "cune": {
         name_es: "Cune", name_en: "Cune", name_de: "Cune", name_fr: "Cune",
-        price: "20,00 €", category: "riojas"
+        price: "20,00 €", category: "riojas",
+        image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800"
     },
     "ramon_bilbao": {
         name_es: "Ramón Bilbao", name_en: "Ramón Bilbao", name_de: "Ramón Bilbao", name_fr: "Ramón Bilbao",
-        price: "19,00 €", category: "riojas"
+        price: "19,00 €", category: "riojas",
+        image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800"
     },
     "muga": {
         name_es: "Muga", name_en: "Muga", name_de: "Muga", name_fr: "Muga",
-        price: "28,00 €", category: "riojas"
+        price: "28,00 €", category: "riojas",
+        image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800"
     },
     "marques_riscal": {
         name_es: "Marqués de Riscal", name_en: "Marqués de Riscal", name_de: "Marqués de Riscal", name_fr: "Marqués de Riscal",
-        price: "28,00 €", category: "reservas"
+        price: "28,00 €", category: "reservas",
+        image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800"
     },
     "vina_ardanza": {
         name_es: "Viña Ardanza", name_en: "Viña Ardanza", name_de: "Viña Ardanza", name_fr: "Viña Ardanza",
-        price: "32,00 €", category: "reservas"
+        price: "32,00 €", category: "reservas",
+        image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800"
     },
     "imperial": {
         name_es: "Imperial", name_en: "Imperial", name_de: "Imperial", name_fr: "Imperial",
-        price: "34,00 €", category: "reservas"
+        price: "34,00 €", category: "reservas",
+        image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=800"
     },
     "terras_gauda": {
         name_es: "Terras Gauda", name_en: "Terras Gauda", name_de: "Terras Gauda", name_fr: "Terras Gauda",
-        price: "23,50 €", category: "albarinos"
+        price: "23,50 €", category: "albarinos",
+        image: "https://images.unsplash.com/photo-1474722883778-792e7990302f?w=800"
     },
     "martin_codax": {
         name_es: "Martín Codax", name_en: "Martín Codax", name_de: "Martín Codax", name_fr: "Martín Codax",
-        price: "23,00 €", category: "albarinos"
+        price: "23,00 €", category: "albarinos",
+        image: "https://images.unsplash.com/photo-1474722883778-792e7990302f?w=800"
     },
     "mar_frades": {
         name_es: "Mar de Frades", name_en: "Mar de Frades", name_de: "Mar de Frades", name_fr: "Mar de Frades",
-        price: "23,50 €", category: "albarinos"
+        price: "23,50 €", category: "albarinos",
+        image: "https://images.unsplash.com/photo-1474722883778-792e7990302f?w=800"
     },
     "juve_camps": {
         name_es: "Juve & Camps Reserva", name_en: "Juve & Camps Reserva", name_de: "Juve & Camps Reserva", name_fr: "Juve & Camps Reserva",
-        price: "28,00 €", category: "cavas"
+        price: "28,00 €", category: "cavas",
+        image: "https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=800"
     },
     "moet_chandon": {
         name_es: "Möet & Chandon Brut", name_en: "Möet & Chandon Brut", name_de: "Möet & Chandon Brut", name_fr: "Möet & Chandon Brut",
-        price: "58,00 €", category: "cavas"
+        price: "58,00 €", category: "cavas",
+        image: "https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=800"
     }
 };
 
@@ -250,22 +280,19 @@ const wineData = {
 let availabilityData = {};
 function normalizeStatus(status) {
     const statusMap = {
-        // Español
         'alta': 'green', 'baja': 'orange', 'completo': 'red',
         'Alta': 'green', 'Baja': 'orange', 'Completo': 'red',
-        // Inglés
         'high': 'green', 'low': 'orange', 'full': 'red',
         'High': 'green', 'Low': 'orange', 'Full': 'red',
-        // Cualquier otro → null (se elimina)
     };
     return statusMap[status] || (['green', 'orange', 'red'].includes(status) ? status : null);
 }
+
 async function loadAvailabilityFromDB() {
     try {
         const doc = await db.collection("disponibilidad").doc("calendario").get();
         if (doc.exists) {
             let rawData = doc.data();
-            // 🔄 MIGRA AUTOMÁTICAMENTE datos antiguos a nuevo formato
             const migrated = {};
             let hasChanges = false;
             for (const date in rawData) {
@@ -277,7 +304,6 @@ async function loadAvailabilityFromDB() {
             }
             availabilityData = migrated;
             
-            // 💾 Si hubo migración, guarda AUTOMÁTICO en Firebase (una sola vez)
             if (hasChanges) {
                 console.log("🔄 Migrando datos antiguos a nuevo formato...");
                 await db.collection("disponibilidad").doc("calendario").set(availabilityData);
@@ -302,7 +328,6 @@ function saveAvailabilityToDB() {
             console.error("Error al guardar en Firebase: ", error);
         });
 }
-
 
 // --- 4. TRADUCCIONES DE LA INTERFAZ (UI) ---
 const uiTranslations = {
@@ -356,7 +381,7 @@ const uiTranslations = {
         wine_section_reservas: "Reserva Wines", wine_section_albarinos: "Albariños",
         wine_section_cavas: "Cavas & Champagnes", wine_footer: "10% VAT included",
     },
-    de: { // (Traducciones para Alemán)
+    de: {
         tab_home: "Start", tab_menu: "Speisekarte", tab_wine: "Weine",
         home_subtitle: "Restaurant in Santander", home_cta: "Speisekarte",
         home_reservations: "Reservierungen", home_phone_landline: "Festnetz",
@@ -381,7 +406,7 @@ const uiTranslations = {
         wine_section_reservas: "Reservas", wine_section_albarinos: "Albariños",
         wine_section_cavas: "Cavas & Champagner", wine_footer: "10% MwSt. inbegriffen",
     },
-    fr: { // (Traducciones para Francés)
+    fr: {
         tab_home: "Accueil", tab_menu: "Carte", tab_wine: "Vins",
         home_subtitle: "Restaurant à Santander", home_cta: "Voir la Carte",
         home_reservations: "Réservations", home_phone_landline: "Fixe",
@@ -430,6 +455,19 @@ function updateLanguage(lang) {
     langMenu.classList.remove("show");
     
     renderCalendar(calCurrentDate);
+    renderMenu(lang);
+    renderWines(lang);
+}
+
+function showImageModal(imageUrl) {
+    imageModalImg.src = imageUrl;
+    imageModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
+
+function closeImageModal() {
+    imageModal.style.display = "none";
+    document.body.style.overflow = "";
 }
 
 function renderMenu(lang) {
@@ -453,6 +491,9 @@ function renderMenu(lang) {
         }
         
         li.innerHTML = `
+            <button class="item-info-btn" data-image="${item.image}" title="Ver imagen">
+                <i data-lucide="info"></i>
+            </button>
             <div class="item-details">
                 <span class="item-name">${name}</span>
                 ${descHTML}
@@ -471,6 +512,15 @@ function renderMenu(lang) {
 
     menuFooter.innerText = uiTranslations[lang]["menu_footer"];
     document.querySelector("#page-carta h1").innerText = uiTranslations[lang]["menu_title"];
+    
+    lucide.createIcons();
+    
+    document.querySelectorAll(".item-info-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            showImageModal(btn.dataset.image);
+        });
+    });
 }
 
 function renderWines(lang) {
@@ -488,6 +538,9 @@ function renderWines(lang) {
         const li = document.createElement("li");
         li.className = "list-item";
         li.innerHTML = `
+            <button class="item-info-btn" data-image="${item.image}" title="Ver imagen">
+                <i data-lucide="info"></i>
+            </button>
             <div class="item-details">
                 <span class="item-name">${name}</span>
             </div>
@@ -504,15 +557,16 @@ function renderWines(lang) {
             wineCavasList.appendChild(li);
         }
     }
+    
+    lucide.createIcons();
+    
+    document.querySelectorAll(".item-info-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            showImageModal(btn.dataset.image);
+        });
+    });
 }
-
-function updateTabIndicator(activeTab) {
-    if (!activeTab) return;
-    tabIndicator.style.width = `${activeTab.offsetWidth}px`;
-    tabIndicator.style.transform = `translateX(${activeTab.offsetLeft}px)`;
-}
-
-// --- LÓGICA DEL CALENDARIO ---
 
 function renderCalendar(date) {
     const year = date.getFullYear();
@@ -587,8 +641,6 @@ function changeCalendarMonth(offset) {
     renderCalendar(calCurrentDate);
 }
 
-// --- LÓGICA DEL MODAL ADMIN ---
-
 function showAdminModal() {
     adminModalOverlay.style.display = "flex";
     adminLoginView.classList.add("active");
@@ -614,7 +666,6 @@ function handleAdminLogin() {
             adminLoginView.classList.remove("active");
             adminEditorView.classList.add("active");
             
-            // ✅ Inicializa el mini-calendario inmediatamente
             adminMiniCurrentDate = new Date();
             adminMiniSelectedDates.clear();
             
@@ -648,19 +699,16 @@ function handleCalendarDateClick(isoDate) {
     adminLoginView.classList.remove("active");
     adminEditorView.classList.add("active");
     
-    // 🔥 PRE-SELECCIONA el día clicado
     adminMiniSelectedDates = new Set([isoDate]);
     adminMiniCurrentDate = new Date(isoDate);
     
-    // ✅ RENDERIZA el mini-calendario DESPUÉS de actualizar la fecha
     setTimeout(() => {
         renderAdminMiniCalendar();
-        lucide.createIcons(); // Re-inicializa los iconos
+        lucide.createIcons();
     }, 10);
     
     updateSelectedCount();
     
-    // Pre-selecciona estado actual
     const currentStatus = availabilityData[isoDate] || "none";
     const radioToCheck = document.getElementById(`status-${currentStatus}`);
     if(radioToCheck) radioToCheck.checked = true;
@@ -668,20 +716,17 @@ function handleCalendarDateClick(isoDate) {
     adminSaveSuccess.style.display = "none";
 }
 
-// 🔥 RENDER MINI-CAL
 function renderAdminMiniCalendar() {
     const year = adminMiniCurrentDate.getFullYear();
     const month = adminMiniCurrentDate.getMonth();
     const lang = currentLang;
     
-    // Mes
     const monthNames = [
         uiTranslations[lang]?.month_1 || "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
     document.getElementById("admin-mini-month-year").innerText = `${monthNames[month]} ${year}`;
     
-    // Días header
     const daysHeader = document.getElementById("admin-mini-days-header");
     daysHeader.innerHTML = "";
     const dayLabels = uiTranslations[lang] ? 
@@ -695,7 +740,6 @@ function renderAdminMiniCalendar() {
         daysHeader.appendChild(div);
     });
     
-    // Días mes
     const datesGrid = document.getElementById("admin-mini-dates-grid");
     datesGrid.innerHTML = "";
     
@@ -703,14 +747,12 @@ function renderAdminMiniCalendar() {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
     
-    // Padding
     for (let i = 0; i < startOffset; i++) {
         const div = document.createElement("div");
         div.className = "admin-mini-date other-month";
         datesGrid.appendChild(div);
     }
     
-    // Días
     const todayStr = new Date().toISOString().split('T')[0];
     for (let day = 1; day <= daysInMonth; day++) {
         const isoDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -718,14 +760,12 @@ function renderAdminMiniCalendar() {
         div.className = `admin-mini-date ${adminMiniSelectedDates.has(isoDate) ? 'selected' : ''} ${isoDate === todayStr ? 'today' : ''}`;
         div.innerHTML = `<span>${day}</span>`;
         div.dataset.date = isoDate;
-        div.dataset.weekStart = getWeekStart(isoDate); // 🔥 NUEVO: guarda el inicio de semana
+        div.dataset.weekStart = getWeekStart(isoDate);
         
         div.addEventListener("click", (e) => {
             if (e.shiftKey) {
-                // Shift+Click = Selecciona semana completa
                 selectWeek(isoDate);
             } else {
-                // Click normal = Selecciona día individual
                 toggleAdminMiniDate(isoDate, div);
             }
         });
@@ -733,17 +773,15 @@ function renderAdminMiniCalendar() {
     }
 }
 
-// 🔥 NUEVA FUNCIÓN: Obtiene el lunes de la semana de una fecha
 function getWeekStart(isoDate) {
     const date = new Date(isoDate);
     const day = date.getDay();
-    const diff = (day === 0 ? -6 : 1) - day; // Ajuste para que lunes sea inicio
+    const diff = (day === 0 ? -6 : 1) - day;
     const monday = new Date(date);
     monday.setDate(date.getDate() + diff);
     return monday.toISOString().split('T')[0];
 }
 
-// 🔥 NUEVA FUNCIÓN: Selecciona todos los días de una semana
 function selectWeek(isoDate) {
     const startDate = new Date(getWeekStart(isoDate));
     
@@ -752,7 +790,6 @@ function selectWeek(isoDate) {
         currentDate.setDate(startDate.getDate() + i);
         const dateStr = currentDate.toISOString().split('T')[0];
         
-        // Solo selecciona días del mes actual visible
         if (currentDate.getMonth() === adminMiniCurrentDate.getMonth()) {
             adminMiniSelectedDates.add(dateStr);
         }
@@ -786,10 +823,9 @@ function updateSelectedCount() {
 function changeAdminMiniMonth(offset) {
     adminMiniCurrentDate.setMonth(adminMiniCurrentDate.getMonth() + offset);
     renderAdminMiniCalendar();
-    lucide.createIcons(); // Re-inicializa los iconos después de cambiar mes
+    lucide.createIcons();
 }
 
-// 🔥 GUARDAR MULTI
 function handleAdminSave() {
     const selectedRadio = document.querySelector('input[name="admin-status"]:checked');
     if (!selectedRadio || adminMiniSelectedDates.size === 0) {
@@ -810,7 +846,7 @@ function handleAdminSave() {
     });
     
     saveAvailabilityToDB();
-    renderCalendar(calCurrentDate); // Actualiza cal principal
+    renderCalendar(calCurrentDate);
     
     adminSaveSuccess.style.display = "block";
     adminSaveSuccess.innerText = `¡${savedCount} día(s) guardado(s)!`;
@@ -818,7 +854,7 @@ function handleAdminSave() {
     setTimeout(() => {
         adminSaveSuccess.style.display = "none";
         adminSaveSuccess.innerText = uiTranslations[currentLang].admin_save_success;
-        closeAdminModal(); // Cierra auto
+        closeAdminModal();
     }, 2000);
 }
 
@@ -837,7 +873,6 @@ tabs.forEach(tab => {
         if (targetPage) targetPage.classList.add("active");
         tab.classList.add("active");
         langMenu.classList.remove("show");
-        updateTabIndicator(tab);
         appContainer.classList.toggle('on-home', targetPageId === 'page-home');
     });
 });
@@ -863,7 +898,6 @@ adminSubmitLoginBtn.addEventListener("click", handleAdminLogin);
 adminSubmitSaveBtn.addEventListener("click", handleAdminSave);
 adminLogoutBtn.addEventListener("click", handleAdminLogout);
 
-// 🔥 ADMIN MINI-CAL EVENTS
 document.getElementById("admin-mini-prev").addEventListener("click", () => changeAdminMiniMonth(-1));
 document.getElementById("admin-mini-next").addEventListener("click", () => changeAdminMiniMonth(1));
 document.getElementById("admin-clear-selection").addEventListener("click", () => {
@@ -872,7 +906,6 @@ document.getElementById("admin-clear-selection").addEventListener("click", () =>
     updateSelectedCount();
 });
 
-// 🗑️ LIMPIAR TODO EL CALENDARIO
 document.getElementById("admin-clear-all-btn").addEventListener("click", () => {
     if (confirm("⚠️ ¿Estás seguro de que quieres ELIMINAR TODOS los estados del calendario?\n\nEsta acción NO se puede deshacer.")) {
         availabilityData = {};
@@ -884,13 +917,16 @@ document.getElementById("admin-clear-all-btn").addEventListener("click", () => {
     }
 });
 
+imageModalClose.addEventListener("click", closeImageModal);
+imageModal.addEventListener("click", (e) => {
+    if (e.target === imageModal) {
+        closeImageModal();
+    }
+});
+
 // --- 7. INICIALIZACIÓN ---
 updateLanguage(currentLang);
 renderMenu(currentLang);
 renderWines(currentLang);
 
-const initialActiveTab = document.querySelector(".tab-item.active");
-updateTabIndicator(initialActiveTab);
-
-// Carga los datos de Firebase y LUEGO renderiza el calendario
 loadAvailabilityFromDB();
