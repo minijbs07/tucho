@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏛️ La Tucho - Restaurante Premium
 
-## Getting Started
+![La Tucho Banner](https://latucho.com.es/wp-content/uploads/2021/04/la-tucho-restaurante.jpg)
 
-First, run the development server:
+### [Visitar Web](https://minijbs07.github.io/tucho/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Reinvención digital de **La Tucho**, el emblemático restaurante de Santander especializado en producto fresco del Cantábrico y carnes nobles. Este proyecto transforma una web estática tradicional en una experiencia inmersiva de **"Quiet Luxury"**, combinando minimalismo moderno con la tradición cántabra.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Características Principales
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 🌊 **Diseño Editorial Premium:** Estética inspirada en Apple.com y hoteles boutique (Aman, Casa Cook).
+- 📱 **Mobile-First Experience:** Navegación fluida y adaptativa para dispositivos móviles.
+- 🌍 **Multiidioma (i18n):** Soporte completo para Español, Inglés, Francés y Alemán.
+- 🍷 **Bodega & Carta Digital:** Visualización elegante de la oferta gastronómica y de vinos.
+- 🗓️ **Calendario en Tiempo Real:** Gestión de disponibilidad integrada con Firebase Firestore.
+- 🔐 **Portal Admin Privado:** Panel de control para gestionar la ocupación del restaurante de forma intuitiva.
 
-## Learn More
+## 🛠️ Stack Tecnológico
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Lenguaje:** TypeScript
+- **Estilos:** Tailwind CSS v4
+- **Animaciones:** Framer Motion + GSAP
+- **Scroll:** Lenis Smooth Scrolling
+- **Backend/DB:** Firebase Firestore & Auth
+- **Deployment:** GitHub Actions & Pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Paleta de Colores & Diseño
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Warm Ivory (#FAF7F2):** Pureza y espacio.
+- **Deep Brown (#3A2416):** Elegancia y tradición cántabra.
+- **Muted Gold (#B08A57):** Detalles de distinción.
+- **Tipografía Serif:** Cormorant Garamond (Elegancia display).
+- **Tipografía Sans:** Inter (Claridad moderna).
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Desarrollo e Instalación
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/minijbs07/tucho.git
+   ```
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+3. Ejecuta el servidor de desarrollo:
+   ```bash
+   npm run dev
+   ```
+
+## 📄 Licencia
+
+Desarrollado con pasión por la excelencia gastronómica de Santander. Todos los derechos reservados.
