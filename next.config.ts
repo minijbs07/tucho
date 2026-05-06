@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   },
   // Si vas a usar github pages SIN dominio personalizado (es decir, en minijbs07.github.io/tucho),
   // descomenta la siguiente línea:
-  // basePath: "/tucho",
+  basePath: "/tucho",
 };
 
 export default nextConfig;
